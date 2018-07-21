@@ -14,6 +14,20 @@ namespace TwitchVods.Tests
         }
 
         [Fact]
+        public void return_the_correct_duration_when_no_hours_specified()
+        {
+            var twitchDuration = new DurationParser();
+            twitchDuration.FromDuration("0m23s").ShouldBe(23);
+        }
+
+        [Fact]
+        public void return_the_correct_duration_when_no_mins_specified()
+        {
+            var twitchDuration = new DurationParser();
+            twitchDuration.FromDuration("23s").ShouldBe(23);
+        }
+
+        [Fact]
         public void return_the_correct_duration_for_seconds_with_single_digit()
         {
             var twitchDuration = new DurationParser();

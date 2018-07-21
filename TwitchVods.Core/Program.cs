@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using TwitchVods.Core.Output;
+using TwitchVods.Core.Twitch.Helix;
 using TwitchVods.Core.Twitch.Kraken;
 
 namespace TwitchVods.Core
@@ -78,7 +79,8 @@ namespace TwitchVods.Core
 
         private static async Task WriteChannelVideos(string channelName, Settings settings, IAsyncPolicy retryPolicy)
         {
-            var client = new KrakenTwitchClient(channelName, settings, retryPolicy);
+            // var client = new KrakenTwitchClient(channelName, settings, retryPolicy);
+            var client = new HelixTwitchClient(channelName, settings, retryPolicy, new DurationParser());
 
             var channel = await client.GetChannelVideosAsync();
 
@@ -94,7 +96,11 @@ namespace TwitchVods.Core
             return Policy.Handle<Exception>()
                 .WaitAndRetryAsync(
                     maxRetries,
-                    retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+                    retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), (exception, span) =>
+                    {
+                        Console.WriteLine($"Polly caught and exception: {exception.ToString()}");
+                    }
+                );
         }
     }
 }
